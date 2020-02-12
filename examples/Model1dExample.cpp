@@ -26,8 +26,6 @@ int main(int argc, char **argv)
     float hammerForce = 0;
     float malletStrikeSpeed = 5.0;
 
-    float mouthPressure = 0.00;
-
     int speedCount = 0;
 
     Realtime rt = quickAudio([&](int n, int nc, float *in, float *out)
@@ -165,7 +163,6 @@ int main(int argc, char **argv)
             InputFloat("Bow alpha", &bowAlpha, 0.01, 0.1);
             InputFloat("Bow epsilon", &bowEpsilon, 0.01, 0.1);
         }
-        InputFloat("Mouth pressure", &mouthPressure, 0.01, 0.1);
 
         if (CollapsingHeader("Mallet"))
         {

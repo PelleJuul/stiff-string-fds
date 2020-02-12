@@ -91,8 +91,6 @@ class Model1d
     /// Adds an external force `force` e.g. a mallet or other exciter at
     /// point `i`.
 
-    void addReedForce(int i, float mouthPressure);
-
     void addStiffness();
     /// Adds a stiffness force arising from the material variables that will.
 

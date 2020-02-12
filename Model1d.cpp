@@ -53,18 +53,6 @@ static float mapRange(float x, float oldMin, float oldMax, float newMin, float n
     return newMin + r * (newMax - newMin);
 }
 
-void Model1d::addReedForce(int i, float mouthPressure)
-{
-    float deltaPressure = u.at(i) - mouthPressure;
-    float alpha = mapRange(deltaPressure, -0.1, 1.8, 1.0, 0.0);
-
-    if (deltaPressure < -0.1)
-        alpha = 1.0;
-
-    forces.at(i) += pow2(k) * alpha * u.at(i) + (1.0 - alpha) * mouthPressure;
-}
-
-
 void Model1d::addStiffness()
 {
     float kappa = sqrt(E * momentOfInertia / linearDensity);
