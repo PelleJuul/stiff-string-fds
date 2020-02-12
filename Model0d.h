@@ -45,7 +45,7 @@ class Model0d
     /// forces.
     /// To better understand how they are used look at Stefan Bilbao's Numerical
     /// sound synthesis chapter 3.5 and compare it to the implementations of
-    /// `addSpringForceFreq` and `addDampening`.
+    /// `addSpringForceFreq` and `addDamping`.
     float forces = 0;
     float mul = 1.0;
 
@@ -81,7 +81,7 @@ class Model0d
     ///     F = -(1/m) * c * (u - u0)^3.
     /// ```
 
-    void addDampening(float sigma0);
+    void addDamping(float sigma0);
     /// Adds dampening to the system causing an exponential decay.
 
     void addBowForce(float vb, float fb, float a = 10, float epsilon = 0.1);

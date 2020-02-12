@@ -12,7 +12,7 @@ int main(int argc, char **argv)
         for (int i = 0; i < n; i++)
         {
             m.addSpringForceFreq(0, 440);
-            m.addDampening(1);
+            m.addDamping(1);
             m.addBowForce(0.2, 1, 10, 0.1);
             m.compute();
 

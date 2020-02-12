@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 
                 string.addTensionFreq(wavespeed);
                 string.addStiffness();
-                string.addDampening(dampening);
+                string.addDamping(dampening);
                 string.addFrequencyDependentDamping(
                     powf(10, -freqDepDampening));
 

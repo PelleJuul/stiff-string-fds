@@ -30,7 +30,7 @@ void Model0d::addNonLinearSpringForceFreq(float u0, float f)
     forces -= pow2(pow2(omega)) * pow2(k) * powf(u - u0, 3);
 }
 
-void Model0d::addDampening(float sigma0)
+void Model0d::addDamping(float sigma0)
 {
     forces += k * sigma0 * up;
     mul *= 1.0 / (1.0 + k * sigma0);

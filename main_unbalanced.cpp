@@ -110,7 +110,7 @@ class Model0d
         forces -= (1.0 / mass) * c * pow2(k) * sinh(b * (u - u0)) / sinh(b);
     }
 
-    void addDampening(float sigma0)
+    void addDamping(float sigma0)
     {
         forces += k * sigma0 * up;
         mul *= 1.0 / (1.0 + k * sigma0);
@@ -168,7 +168,7 @@ int main(int argc, char **argv)
             m1.addNonLinearSpringForce(0, 2 * M_PI * f);
             // m1.addSpringForce(0, k);
             m1.addBowForce(vb, fb, 0.1);
-            m1.addDampening(10);
+            m1.addDamping(10);
 
             m1.compute();
             float y = 1000 * (m1.u);

@@ -26,7 +26,7 @@ void Model1d::addContinuousBowForce(int i, float vb, float fb, float alpha)
     forces.at(i) -= pow2(k) * f;
 }
 
-void Model1d::addDampening(float sigma0)
+void Model1d::addDamping(float sigma0)
 {
     for (int i = 0; i < N; i++)
     {

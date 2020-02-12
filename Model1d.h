@@ -66,7 +66,7 @@ class Model1d
     /// forces.
     /// To better understand how they are used look at Stefan Bilbao's Numerical
     /// sound synthesis chapter 3.5 and compare it to the implementations of
-    /// `addSpringForceFreq` and `addDampening`.
+    /// `addSpringForceFreq` and `addDamping`.
 
     /// ### Functions
 
@@ -78,7 +78,7 @@ class Model1d
     /// Adds a continuous bow force where `vb` is the bow speed, `fb` is the
     /// bow force, and `alpha` determinse the shape of the friction curve.
 
-    void addDampening(float sigma0);
+    void addDamping(float sigma0);
     /// Adds a frequency independent dampening to the system where `sigma0` is
     /// the amount of dampening.
 

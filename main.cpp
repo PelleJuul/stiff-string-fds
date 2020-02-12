@@ -106,7 +106,7 @@ class Model0d
         forces -= (1.0 / mass) * powf(c, 4) * pow2(k) * powf(u - u0, 3);
     }
 
-    void addDampening(float sigma0)
+    void addDamping(float sigma0)
     {
         forces += k * sigma0 * up;
         mul *= 1.0 / (1.0 + k * sigma0);
@@ -166,14 +166,14 @@ int main(int argc, char **argv)
         {
             m1.addSpringForce(0, k);
             m1.addSpringForce(m2.u, k);
-            m1.addDampening(8);
+            m1.addDamping(8);
 
             m2.addSpringForce(m1.u, k);
             m2.addSpringForce(m3.u, k);
-            m2.addDampening(8);
+            m2.addDamping(8);
 
             m3.addSpringForce(m2.u, k);
-            m3.addDampening(8);
+            m3.addDamping(8);
 
             m3.addBowForce(vb, fb, 1, 0.005);
 

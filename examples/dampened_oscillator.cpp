@@ -15,7 +15,7 @@ int main(int argc, char **argv)
         for (int i = 0; i < n; i++)
         {
             m.addSpringForceFreq(0, 440);
-            m.addDampening(3);
+            m.addDamping(3);
             m.compute();
 
             // Compute your sample here.
