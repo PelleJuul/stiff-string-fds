@@ -1,4 +1,4 @@
-#include <pal.h>
+#include "pal/pal.h"
 #include <cmath>
 #include "../Mallet.h"
 #include "../Model1d.h"

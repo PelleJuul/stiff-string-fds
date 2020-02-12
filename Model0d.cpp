@@ -1,6 +1,6 @@
-#include <pal.h>
 #include "utils.h"
-#include "Model1d.h"
+#include "Model0d.h"
+#include <cmath>
 
 Model0d::Model0d(float fs)
 {
