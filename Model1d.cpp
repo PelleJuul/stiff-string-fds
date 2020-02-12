@@ -47,6 +47,14 @@ void Model1d::addExternalForce(int i, float force)
     forces.at(i) += N * (1.0 / linearDensity) * pow2(k) * force;
 }
 
+void Model1d::addFrequencyDependentDamping(float sigma1)
+{
+    for (int i = 0; i < N; i++)
+    {
+        forces.at(i) += k * 2 * sigma1 * (u.dxx(i) - up.dxx(i));
+    }
+}
+
 static float mapRange(float x, float oldMin, float oldMax, float newMin, float newMax)
 {
     float r = (x - oldMin) / (oldMax - oldMin);

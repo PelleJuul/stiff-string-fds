@@ -91,6 +91,10 @@ class Model1d
     /// Adds an external force `force` e.g. a mallet or other exciter at
     /// point `i`.
 
+    void addFrequencyDependentDamping(float sigma1);
+    /// Adds a dampening force that cause higher frequencies to die out faster
+    /// than lower ones. `sigma1` controls the amount of dampening.
+
     void addStiffness();
     /// Adds a stiffness force arising from the material variables that will.
 

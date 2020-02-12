@@ -3,17 +3,20 @@
 #include "../Mallet.h"
 #include "../Model1d.h"
 
-// pal build Model1dExample.cpp ../Model1d.cpp ../Domain1d.cpp ../Mallet.cpp -g -o Model1dExample
+// pal build Model1dExample.cpp ../Model1d.cpp ../Domain1d.cpp ../Mallet.cpp -O3 -o Model1dExample
 
 int main(int argc, char **argv)
 {
     bool pluck = false;
     bool step = false;
     bool mute = false;
-    int bowSelect = 0;
+    int bowSelect = 3;
 
     Model1d string(100);
     Mallet mallet;
+
+    float dampening = 1;
+    float freqDepDampening = 5;
 
     float wavespeed = 220;
     float stiffness = 1;
@@ -24,7 +27,7 @@ int main(int argc, char **argv)
     float bowAlpha = 1.0;
     float bowEpsilon = 0.1;
     float hammerForce = 0;
-    float malletStrikeSpeed = 5.0;
+    float malletStrikeSpeed = 1.0;
 
     int speedCount = 0;
 
@@ -44,7 +47,9 @@ int main(int argc, char **argv)
                 {
                     for (int i = 5; i < 10; i++)
                     {
-                        string.addExternalForce(i, pow(sin(M_PI * i / 10.0), 2));
+                        string.addExternalForce(
+                            i,
+                            pow(sin(M_PI * i / 10.0), 2));
                     }
 
                     pluck = false;
@@ -56,9 +61,12 @@ int main(int argc, char **argv)
 
                 string.addTensionFreq(wavespeed);
                 string.addStiffness();
-                string.addDampening(2);
+                string.addDampening(dampening);
+                string.addFrequencyDependentDamping(
+                    powf(10, -freqDepDampening));
 
-                hammerForce = mallet.computeAndApplyImpactForce(string.u.at(10));
+                hammerForce = mallet.computeAndApplyImpactForce(
+                    string.u.at(10));
 
                 string.addExternalForce(10, hammerForce);
 
@@ -98,7 +106,7 @@ int main(int argc, char **argv)
                 y = 100 * string.u.at(30);
             }
 
-            if (abs(y) > 1.0)
+            if (abs(y) > 1.5)
             {
                 mute = true;
             }
@@ -125,6 +133,9 @@ int main(int argc, char **argv)
 
         SliderFloat("Wave speed", &wavespeed, 0, 440);
         SliderFloat("Stiffness", &stiffness, 0, 8);
+        InputFloat("Dampening", &dampening, 0.5, 1);
+        InputFloat("Freq. dampening", &freqDepDampening, 0.5, 1);
+
         InputFloat("Speed", &speed, 0.001, 0.1, 3);
 
         if (Button("Step"))
@@ -146,7 +157,15 @@ int main(int argc, char **argv)
             string.un.clear();
         }
 
-        PlotLines("String", [](void *data, int idx) { return (float)((double*)data)[idx]; }, string.u.data(), string.u.size() + 4, 0, "", -0.01, 0.01, ImVec2(0, 120));
+        PlotLines(
+            "String",
+            [](void *data, int idx) { return (float)((double*)data)[idx]; }, string.u.data(),
+            string.u.size() + 4,
+            0,
+            "",
+            -0.01,
+            0.01,
+            ImVec2(0, 120));
 
         End();
 
