@@ -19,9 +19,12 @@ PAL_HEADERS=$(wildcard pal/*.h) $(wildcard pal/**/*.h)
 PAL_OBJECTS=$(patsubst %.cpp, %.o, $(PAL_SOURCES))
 PAL_DEPS := $(PAL_OBJECTS:.o=.d)
 
-all: Model1dExample
+all: Model1dExample ReedExample
 
 Model1dExample: Model1dExample.cpp $(OBJECTS) $(PAL_OBJECTS)
+	$(CPP) $(CPPFLAGS) $(PAL_OBJECTS) $(OBJECTS) $(LIBS) $< -o $@
+
+ReedExample: ReedExample.cpp $(OBJECTS) $(PAL_OBJECTS)
 	$(CPP) $(CPPFLAGS) $(PAL_OBJECTS) $(OBJECTS) $(LIBS) $< -o $@
 
 %.o : %.cpp

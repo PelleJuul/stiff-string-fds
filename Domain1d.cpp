@@ -37,14 +37,14 @@ double Domain1d::dxxxx(int l)
 
 void Domain1d::prepareClampedBoundaryLeft()
 {
-    at(-2) = -at(0);
+    at(-2) = at(0);
     at(-1) = 0;
 }
 
 void Domain1d::prepareClampedBoundaryRight()
 {
     at(L) = 0;
-    at(L+1) = -at(L-1);
+    at(L+1) = at(L-1);
 }
 
 void Domain1d::prepareFreeBoundaryLeft()

@@ -2,6 +2,7 @@
 #include <cmath>
 #include "../Mallet.h"
 #include "../Model1d.h"
+#include "../Material.h"
 
 // pal build Model1dExample.cpp ../Model1d.cpp ../Domain1d.cpp ../Mallet.cpp -O3 -o Model1dExample
 
@@ -13,7 +14,11 @@ int main(int argc, char **argv)
     int bowSelect = 3;
 
     Model1d string(100);
+    string.setMaterial(Material::createSteelMaterial());
     Mallet mallet;
+
+    Adsr forceAdsr(0.3, 0.2, 1.0, 0.2);
+    Adsr velocityAdsr(0.15, 0.2, 1.0, 0.4);
 
     float dampening = 1;
     float freqDepDampening = 5;
@@ -23,8 +28,8 @@ int main(int argc, char **argv)
     float speed = 1.0;
     float bowSpeed = 0.2;
     float bowForce = 0.0;
-    float bowPosition = 0.0;
-    float bowAlpha = 1.0;
+    float bowPosition = 0.15;
+    float bowAlpha = 50.0;
     float bowEpsilon = 0.1;
     float hammerForce = 0;
     float malletStrikeSpeed = 1.0;
@@ -70,6 +75,9 @@ int main(int argc, char **argv)
 
                 string.addExternalForce(10, hammerForce);
 
+                bowSpeed = 0.2 * velocityAdsr.next();
+                bowForce = 0.4 * forceAdsr.next();
+
                 switch (bowSelect)
                 {
                 case 0:
@@ -89,6 +97,13 @@ int main(int argc, char **argv)
                     break;
                 case 2:
                     string.addContinuousBowForce(
+                        bowPosition * string.u.size(),
+                        bowSpeed,
+                        bowForce,
+                        bowAlpha);
+                    break;
+                case 3:
+                    string.addContinuousNowtonRaphsonBowForce(
                         bowPosition * string.u.size(),
                         bowSpeed,
                         bowForce,
@@ -175,12 +190,28 @@ int main(int argc, char **argv)
             RadioButton("Linear Bow", &bowSelect, 0);
             RadioButton("Exponential Bow", &bowSelect, 1);
             RadioButton("Contiunous Bow", &bowSelect, 2);
+            RadioButton("Contiunous NR Bow", &bowSelect, 3);
 
             SliderFloat("Bow speed", &bowSpeed, 0, 1);
             SliderFloat("Bow force", &bowForce, 0, 10);
             SliderFloat("Bow position", &bowPosition, 0, 1);
             InputFloat("Bow alpha", &bowAlpha, 0.01, 0.1);
             InputFloat("Bow epsilon", &bowEpsilon, 0.01, 0.1);
+
+            if (Button("Trigger"))
+            {
+                if (forceAdsr.isTriggered)
+                {
+                    forceAdsr.release();
+                    velocityAdsr.release();
+                }
+                else
+                {
+                    forceAdsr.trigger();
+                    velocityAdsr.trigger();
+                }
+                
+            }
         }
 
         if (CollapsingHeader("Mallet"))
@@ -198,6 +229,15 @@ int main(int argc, char **argv)
             LabelText("Mallet position", "%.2f", mallet.u);
             LabelText("Hammer force", "%.2f", hammerForce);
         }
+
+        End();
+
+        Begin("Force Envelope");
+        forceAdsr.draw();
+        End();
+
+        Begin("Velocity Envelope");
+        velocityAdsr.draw();
         End();
     });
 

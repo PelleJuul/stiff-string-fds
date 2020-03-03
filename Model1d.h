@@ -15,7 +15,9 @@
 /// common types of boundary conditions.
 
 /// The Model1d class utilizes the following headers
-#include "Domain1d.h"   // Handle low-level datails of the 1d domain.
+#include "Domain1d.h"   // Handles low-level datails of the 1d domain.
+#include "Reed.h"       // Used for reed-like excitation.
+#include "Material.h"   // Used for setting the model material.
 
 class Model1d
 {
@@ -31,9 +33,11 @@ class Model1d
     /// simulation.
 
     float E = 200e6;    // Young's modulus, Pa (N / m^2) (steel)
-    float p = 8000;     // Density, kg / m^3 (steel)
+    float p = 1.225;    // Density, kg / m^3 (steel) was (8000)
     float r = 0.0003;   // Radius, m
     float length = 0.3; // Length, m
+    float S0 = 1.72e-4; // Bore radius (in case the string is viewed as a tube),
+                        // m^2
     /// describe the material and shape of the domain.
 
     float area;            // Cross-sectional area, m^2
@@ -76,7 +80,12 @@ class Model1d
 
     void addContinuousBowForce(int i, float vb, float fb, float alpha);
     /// Adds a continuous bow force where `vb` is the bow speed, `fb` is the
-    /// bow force, and `alpha` determinse the shape of the friction curve.
+    /// bow force, and  the shape of the friction curve. Some good default
+    /// values are `vb = 0.2`, `fb = 0.4`, `alpha = 50`.
+
+    void addContinuousNowtonRaphsonBowForce(int i, float vb, float fb, float alpha);
+    /// Works the same as `addContinuousBowForce` but uses a more precise,
+    /// but less efficient method of computing the bow force.
 
     void addDamping(float sigma0);
     /// Adds a frequency independent dampening to the system where `sigma0` is
@@ -94,6 +103,12 @@ class Model1d
     void addFrequencyDependentDamping(float sigma1);
     /// Adds a dampening force that cause higher frequencies to die out faster
     /// than lower ones. `sigma1` controls the amount of dampening.
+
+    void addReedForce(Reed *reed, float wavespeed, float pm);
+    /// Adds a woodwind-style reed force at the left side of the system. `reed`
+    /// holds the parameters and state of the reed. `wavespeed` is the wavespeed
+    /// of the string (in this case viewed as a tube). `pm` is the mouth
+    /// pressure.
 
     void addStiffness();
     /// Adds a stiffness force arising from the material variables that will.
@@ -117,6 +132,15 @@ class Model1d
     /// Applies all the added forces to the mass and updates the state `u`.
     /// This should be called every time we want to produce a new sample.
     /// Audio output can be achieved by reading `u`.
+
+    float computeForPoint(int i);
+    /// Compute the next value of `u` at the specified position `i` without
+    /// comitting the change to the state. This is used for computing solutions
+    /// using the Newton-Rhapson method.
+
+    void setMaterial(const Material &material);
+    /// Sets the material parameters of the string to those of the given
+    /// material.
 
     private:
     /// ### Private Variables
