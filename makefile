@@ -1,5 +1,5 @@
-HEADERS=$(wildcard *.h)
-DOCS=$(patsubst %.h, docs/%.h.md, $(HEADERS))
+HEADERS=$(wildcard pal-fds/*.h)
+DOCS=$(patsubst pal-fds/%.h, docs/%.h.md, $(HEADERS))
 
 .PHONY: clean examples documentation
 
@@ -11,7 +11,7 @@ documentation: $(DOCS) docs/
 docs/:
 	mkdir docs
 
-docs/%.h.md : %.h docs/
+docs/%.h.md : pal-fds/%.h docs/
 	python literalize.py $< > $@
 
 clean:

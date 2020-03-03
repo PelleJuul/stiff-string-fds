@@ -9,7 +9,7 @@ LIBS=-lsdl2 -lportaudio -lsndfile -framework OpenGl
 CPPFLAGS+=-O3
 
 # Edit these variables to suit your application.
-SOURCES=$(wildcard ../*.cpp)
+SOURCES=$(wildcard ../pal-fds/*.cpp)
 OBJECTS=$(patsubst %.cpp, %.o, $(SOURCES))
 DEPS := $(OBJECTS:.o=.d)
 

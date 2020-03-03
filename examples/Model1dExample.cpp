@@ -1,8 +1,8 @@
 #include "pal/pal.h"
 #include <cmath>
-#include "../Mallet.h"
-#include "../Model1d.h"
-#include "../Material.h"
+#include "../pal-fds/Mallet.h"
+#include "../pal-fds/Model1d.h"
+#include "../pal-fds/Material.h"
 
 // pal build Model1dExample.cpp ../Model1d.cpp ../Domain1d.cpp ../Mallet.cpp -O3 -o Model1dExample
 
