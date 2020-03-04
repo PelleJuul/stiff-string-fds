@@ -1,0 +1,10 @@
+**/*.o
+**/*.d
+**/*.dSYM
+**/*.ini
+.vscode
+junk/
+**/.DS_Store
+examples/Model1dExample
+examples/ReedExample
+examples/dampened_oscillator
