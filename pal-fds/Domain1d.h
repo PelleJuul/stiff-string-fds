@@ -7,7 +7,12 @@ class Domain1d
     public:
     Domain1d(int size);
 
-    double &at(int l);
+    __attribute__((always_inline)) inline double at(int l)
+    {
+        return v[l+2];
+    }
+
+    double &ref(int l);
 
     void clear(double value = 0);
 

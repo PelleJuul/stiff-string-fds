@@ -21,7 +21,7 @@ PAL_DEPS := $(PAL_OBJECTS:.o=.d)
 
 all: Model1dExample ReedExample
 
-Model1dExample: Model1dExample.cpp $(OBJECTS) $(PAL_OBJECTS)
+Model1dExample: Model1dExample.cpp $(OBJECTS) $(PAL_OBJECTS) ../Munola.h
 	$(CPP) $(CPPFLAGS) $(PAL_OBJECTS) $(OBJECTS) $(LIBS) $< -o $@
 
 ReedExample: ReedExample.cpp $(OBJECTS) $(PAL_OBJECTS)

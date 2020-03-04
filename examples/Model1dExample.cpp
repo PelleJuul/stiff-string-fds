@@ -3,6 +3,7 @@
 #include "../pal-fds/Mallet.h"
 #include "../pal-fds/Model1d.h"
 #include "../pal-fds/Material.h"
+#include "../Munola.h"
 
 // pal build Model1dExample.cpp ../Model1d.cpp ../Domain1d.cpp ../Mallet.cpp -O3 -o Model1dExample
 
@@ -16,6 +17,10 @@ int main(int argc, char **argv)
     Model1d string(100);
     string.setMaterial(Material::createSteelMaterial());
     Mallet mallet;
+
+    char source[255];
+    std::vector<Munola> stack;
+    MunolaPlayer player(stack);
 
     Adsr forceAdsr(0.3, 0.2, 1.0, 0.2);
     Adsr velocityAdsr(0.15, 0.2, 1.0, 0.4);
@@ -40,6 +45,34 @@ int main(int argc, char **argv)
     {
         for (int i = 0; i < n; i++)
         {
+            player.proceed();
+
+            if (player.newEventAvailable())
+            {
+                Munola m = player.consumeNextEvent();
+
+                if (m.type == MunolaType::Note)
+                {
+                    printf("%i %i %.2f\n", m.pitch, m.octave, m.duration);
+
+                    wavespeed = pitchToFreq(m.getMidiPitch());
+
+                    forceAdsr.trigger();
+                    velocityAdsr.trigger();
+                }
+                else if (m.type == MunolaType::Rest)
+                {
+                    printf("Rest %.2f\n", m.duration);
+                    forceAdsr.release();
+                    velocityAdsr.release();
+                }
+                else if (m.type == MunolaType::End)
+                {
+                    forceAdsr.release();
+                    velocityAdsr.release();
+                }
+            }
+
             speedCount++;
             float y = 0;
 
@@ -182,7 +215,7 @@ int main(int argc, char **argv)
             0.01,
             ImVec2(0, 120));
 
-        End();
+        ImGui::End();
 
         Begin("Exciters");
         if (CollapsingHeader("Bows"))
@@ -198,9 +231,9 @@ int main(int argc, char **argv)
             InputFloat("Bow alpha", &bowAlpha, 0.01, 0.1);
             InputFloat("Bow epsilon", &bowEpsilon, 0.01, 0.1);
 
-            if (Button("Trigger"))
+            if (Button("Trigger/Release"))
             {
-                if (forceAdsr.isTriggered)
+                if (forceAdsr.state == AdsrState::AdsrRelease)
                 {
                     forceAdsr.release();
                     velocityAdsr.release();
@@ -230,15 +263,32 @@ int main(int argc, char **argv)
             LabelText("Hammer force", "%.2f", hammerForce);
         }
 
-        End();
+        ImGui::End();
 
         Begin("Force Envelope");
         forceAdsr.draw();
-        End();
+        ImGui::End();
 
         Begin("Velocity Envelope");
         velocityAdsr.draw();
-        End();
+        ImGui::End();
+
+        Begin("Munola");
+        InputText("Code", source, 255);
+        if (Button("Play"))
+        {
+            stack = parseMunola(std::string(source));
+            bool loop = player.loop;
+            MunolaPlayer oldPlayer = player;
+            player = MunolaPlayer(stack);
+            player.loop = oldPlayer.loop;
+            player.tempo = oldPlayer.tempo;
+        }
+
+        InputFloat("Tempo", &player.tempo);
+
+        Checkbox("Loop", &player.loop);
+        ImGui::End();
     });
 
     rt.stop();

@@ -25,7 +25,7 @@ void Model1d::addContinuousBowForce(int i, float vb, float fb, float alpha)
 {
     float eta = fs * (u.at(i) - up.at(i)) - vb;
     float f = N * (1 / linearDensity) * fb * sqrt(2 * alpha) * eta * exp(-alpha * pow2(eta) + 0.5);
-    forces.at(i) -= pow2(k) * f;
+    forces.ref(i) -= pow2(k) * f;
 }
 
 void Model1d::addContinuousNowtonRaphsonBowForce(int lb, float vb, float fb, float alpha)
@@ -44,13 +44,13 @@ void Model1d::addContinuousNowtonRaphsonBowForce(int lb, float vb, float fb, flo
 
         // Add the estimated bow force to the forces
         force = pow2(k) * nh * fb * sqrt(2 * alpha) * vrel * exp(-alpha * pow2(vrel) + 0.5);
-        forces.at(lb) -= force; 
+        forces.ref(lb) -= force; 
 
         // Compute the numerator of the Newton-Raphson step
         float num = c * computeForPoint(lb) - c * up.at(lb) - vb - vrel;
 
         // Restore force
-        forces.at(lb) = fOld;
+        forces.ref(lb) = fOld;
 
         // Compute denominator of NR stepA
         float thetad =
@@ -62,15 +62,15 @@ void Model1d::addContinuousNowtonRaphsonBowForce(int lb, float vb, float fb, flo
         vrel = vrel - delta;
     }
 
-    forces.at(lb) -= force;
+    forces.ref(lb) -= force;
 }
 
 void Model1d::addDamping(float sigma0)
 {
     for (int i = 0; i < N; i++)
     {
-        forces.at(i) += sigma0 * k * up.at(i);
-        multiplier.at(i) *= 1.0 / (1 + k * sigma0);
+        forces.ref(i) += sigma0 * k * up.at(i);
+        multiplier.ref(i) *= 1.0 / (1 + k * sigma0);
     }
 }
 
@@ -78,19 +78,19 @@ void Model1d::addExponentialBowForce(int i, float vb, float fb, float a, float e
 {
     float eta = fs * (u.at(i) - up.at(i)) - vb;
     float f = N * (1 / linearDensity) * fb * sgn(eta) * (epsilon + (1 - epsilon) * exp(-a * fabs(eta)));
-    forces.at(i) -= pow2(k) * f;
+    forces.ref(i) -= pow2(k) * f;
 }
 
 void Model1d::addExternalForce(int i, float force)
 {
-    forces.at(i) += N * (1.0 / linearDensity) * pow2(k) * force;
+    forces.ref(i) += N * (1.0 / linearDensity) * pow2(k) * force;
 }
 
 void Model1d::addFrequencyDependentDamping(float sigma1)
 {
     for (int i = 0; i < N; i++)
     {
-        forces.at(i) += k * 2 * sigma1 * (u.dxx(i) - up.dxx(i));
+        forces.ref(i) += k * 2 * sigma1 * (u.dxx(i) - up.dxx(i));
     }
 }
 
@@ -178,7 +178,7 @@ void Model1d::addReedForce(Reed *reed, float wavespeed, float pm)
     float pin = pm - pdelta;
 
     // Compute un[0]
-    u.at(-1) = 2 * k * gamma * pin - up.at(-1);
+    u.ref(-1) = 2 * k * gamma * pin - up.at(-1);
 }
 
 void Model1d::addStiffness()
@@ -191,7 +191,7 @@ void Model1d::addStiffness(float kappa)
 {
     for (int i = 0; i < N; i++)
     {
-        forces.at(i) -= pow2(kappa) * pow2(k) * u.dxxxx(i);
+        forces.ref(i) -= pow2(kappa) * pow2(k) * u.dxxxx(i);
     }
 }
 
@@ -199,14 +199,14 @@ void Model1d::addTanhBowForce(int i, float vb, float fb, float a)
 {
     float eta = fs * (u.at(i) - up.at(i)) - vb;
     float c = N * (1 / linearDensity) * fb * tanh(a * eta); //; fabs(eta);
-    forces.at(i) += pow2(k) * c;
+    forces.ref(i) += pow2(k) * c;
 }
 
 void Model1d::addTensionFreq(float freq)
 {
     for (int i = 0; i < N; i++)
     {
-        forces.at(i) += pow2(freq) * pow2(k) * u.dxx(i);
+        forces.ref(i) += pow2(freq) * pow2(k) * u.dxx(i);
     }
 }
 
@@ -222,7 +222,7 @@ void Model1d::compute()
 {
     for (int i = 0; i < N; i++)
     {
-        un.at(i) = multiplier.at(i) * (forces.at(i) + 2 * u.at(i) - up.at(i));
+        un.ref(i) = multiplier.at(i) * (forces.at(i) + 2 * u.at(i) - up.at(i));
     }
 
     Domain1d &swap = up;

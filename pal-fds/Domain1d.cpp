@@ -7,7 +7,7 @@ Domain1d::Domain1d(int size) :
     L2 = L * L;
 }
 
-double &Domain1d::at(int l)
+double &Domain1d::ref(int l)
 {
     return v.at(l+2);
 }
@@ -37,25 +37,25 @@ double Domain1d::dxxxx(int l)
 
 void Domain1d::prepareClampedBoundaryLeft()
 {
-    at(-2) = at(0);
-    at(-1) = 0;
+    ref(-2) = at(0);
+    ref(-1) = 0;
 }
 
 void Domain1d::prepareClampedBoundaryRight()
 {
-    at(L) = 0;
-    at(L+1) = at(L-1);
+    ref(L) = 0;
+    ref(L+1) = at(L-1);
 }
 
 void Domain1d::prepareFreeBoundaryLeft()
 {
-    at(-2) = 3 * at(0) - 2 * at(1);
-    at(-1) = 2 * at(0) - at(1);
+    ref(-2) = 3 * at(0) - 2 * at(1);
+    ref(-1) = 2 * at(0) - at(1);
 }
 
 void Domain1d::prepareFreeBoundaryRight()
 {
-    at(L) = 2 * at(L-1) - at(L-2);
-    at(L+1) = 3 * at(L-1) - 2 * at(L-2);
+    ref(L) = 2 * at(L-1) - at(L-2);
+    ref(L+1) = 3 * at(L-1) - 2 * at(L-2);
 }
 
