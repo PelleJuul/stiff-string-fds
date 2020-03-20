@@ -1,0 +1,3 @@
+[submodule "examples/pal"]
+	path = examples/pal
+	url = https://github.com/PelleJuul/pal

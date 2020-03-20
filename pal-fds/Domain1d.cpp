@@ -1,4 +1,5 @@
 #include "Domain1d.h"
+#include <cmath>
 
 Domain1d::Domain1d(int size) :
     v(size+4, 0)
@@ -20,19 +21,32 @@ void Domain1d::clear(double value)
     }
 }
 
-double Domain1d::dxf(int l)
+double Domain1d::dxf(int l) const
 {
     return L * (at(l+1) - at(l));
 }
 
-double Domain1d::dxx(int l)
+double Domain1d::dxx(int l) const
 {
     return L2 * (at(l + 1) - 2 * at(l) + at(l - 1));
 }
 
-double Domain1d::dxxxx(int l)
+double Domain1d::dxxi(float l) const
+{
+    return L2 * (interpolate(l + 1) - 2 * interpolate(l) + interpolate(l - 1));
+}
+
+double Domain1d::dxxxx(int l) const
 {
     return L2 * L2 * (at(l+2) - 4 * at(l+1) + 6 * at(l) - 4 * at(l-1) + at(l-2));
+}
+
+float Domain1d::interpolate(float p) const
+{
+    int i1 = floor(p);
+    int i2 = ceil(p);
+    float a = p - i1;
+    return (1 - a) * at(i1) + a * at(i2);
 }
 
 void Domain1d::prepareClampedBoundaryLeft()

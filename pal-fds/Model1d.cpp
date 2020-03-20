@@ -12,13 +12,23 @@ Model1d::Model1d(int N, float fs) :
     up(ub),
     un(uc),
     forces(N),
-    multiplier(N)
+    divisor(N)
 {
     this->fs = fs;
     k = 1.0 / fs;
 
     this->N = N;
     h = 1.0 / N;
+
+    divisor.clear(1);
+}
+
+void Model1d::addBarrierCollision(float b, float K, float alpha)
+{
+    for (int i = 0; i < N; i++)
+    {
+        forces.ref(i) += N * (1 / linearDensity) * pow2(k) * K * powf(pos(b - u.at(i)), alpha + 1);
+    }
 }
 
 void Model1d::addContinuousBowForce(int i, float vb, float fb, float alpha)
@@ -37,7 +47,7 @@ void Model1d::addContinuousNowtonRaphsonBowForce(int lb, float vb, float fb, flo
     float delta = 1;
     float c = 1.0 / (2 * k);
 
-    for (int i = 0; i < 50 && fabs(delta) > 10e-4; i++)
+    for (int i = 0; i < 50 && fabs(delta) > 1e-4; i++)
     {
         // Save previous force
         float fOld = forces.at(lb);
@@ -56,7 +66,7 @@ void Model1d::addContinuousNowtonRaphsonBowForce(int lb, float vb, float fb, flo
         float thetad =
             sqrt(2 * alpha) * (exp(-alpha * pow2(vrel) + 0.5)
                 - 2 * alpha * pow2(vrel) * exp(-alpha * pow2(vrel) + 0.5));
-        float denom = -c * multiplier.at(lb) * pow2(k) * nh * fb * thetad - 1;
+        float denom = -c * ( 1 / divisor.at(lb)) * pow2(k) * nh * fb * thetad - 1;
 
         float delta = (num / denom);
         vrel = vrel - delta;
@@ -70,7 +80,7 @@ void Model1d::addDamping(float sigma0)
     for (int i = 0; i < N; i++)
     {
         forces.ref(i) += sigma0 * k * up.at(i);
-        multiplier.ref(i) *= 1.0 / (1 + k * sigma0);
+        divisor.ref(i) += k * sigma0;
     }
 }
 
@@ -92,6 +102,15 @@ void Model1d::addFrequencyDependentDamping(float sigma1)
     {
         forces.ref(i) += k * 2 * sigma1 * (u.dxx(i) - up.dxx(i));
     }
+}
+
+void Model1d::addInterpolatedForce(float p, float f)
+{
+    int i1 = floor(p);
+    int i2 = ceil(p);
+    float a = p - i1;
+    addExternalForce(i1, (1 - a) * f);
+    addExternalForce(i2, a * f);
 }
 
 void Model1d::addReedForce(Reed *reed, float wavespeed, float pm)
@@ -197,9 +216,7 @@ void Model1d::addStiffness(float kappa)
 
 void Model1d::addTanhBowForce(int i, float vb, float fb, float a)
 {
-    float eta = fs * (u.at(i) - up.at(i)) - vb;
-    float c = N * (1 / linearDensity) * fb * tanh(a * eta); //; fabs(eta);
-    forces.ref(i) += pow2(k) * c;
+
 }
 
 void Model1d::addTensionFreq(float freq)
@@ -222,7 +239,7 @@ void Model1d::compute()
 {
     for (int i = 0; i < N; i++)
     {
-        un.ref(i) = multiplier.at(i) * (forces.at(i) + 2 * u.at(i) - up.at(i));
+        un.ref(i) = (1 / divisor.at(i)) * (forces.at(i) + 2 * u.at(i) - up.at(i));
     }
 
     Domain1d &swap = up;
@@ -231,12 +248,12 @@ void Model1d::compute()
     un = swap;
 
     forces.clear();
-    multiplier.clear(1);
+    divisor.clear(1);
 }
 
 float Model1d::computeForPoint(int i)
 {
-    return multiplier.at(i) * (forces.at(i) + 2 * u.at(i) - up.at(i));
+    return (1 / divisor.at(i)) * (forces.at(i) + 2 * u.at(i) - up.at(i));
 }
 
 void Model1d::setMaterial(const Material &material)

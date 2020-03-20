@@ -51,8 +51,16 @@ class Model0d
 
     /// ### Functions
 
-    Model0d(float fs);
+    Model0d(float fs = 44100);
     /// Is the constructor for the `Model0d` cass. `fs` is the sample rate.
+
+    virtual void addBarrierCollision(float b, float K, float alpha);
+    /// Adds a collision with a rigid barrier *below* the mass where `b` is
+    /// the position of the barrier, `K` is the stiffness, and `alpha` is a
+    /// non-linear exponent of the collision. 
+
+    void addExternalForce(float f);
+    /// Adds an external force to the mass.
     
     void addSpringForce(float u0, float c);
     /// Adds a linear spring force based on Hooke's law to the mass:
@@ -91,7 +99,12 @@ class Model0d
     /// `a` and `epsilon` controls the character of the bow, see Bilbao's
     /// Numerical Sound Synthesis chapter 4.3.1.
 
-    void compute();
+    float computeForPoint();
+    /// Compute the next value of `u` at the specified position `i` without
+    /// comitting the change to the state. This is used for computing solutions
+    /// using the Newton-Rhapson method.
+
+    virtual void compute();
     /// Applies all the added forces to the mass and updates the state `u`.
     /// This should be called every time we want to produce a new sample.
     /// Audio output can be achieved by reading `u`.

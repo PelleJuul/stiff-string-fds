@@ -8,6 +8,16 @@ Model0d::Model0d(float fs)
     k = 1.0 / fs;
 }
 
+void Model0d::addBarrierCollision(float b, float K, float alpha)
+{
+    forces += (1.0 / mass) * pow2(k) * K * powf(pos(b - u), alpha + 1);
+}
+
+void Model0d::addExternalForce(float f)
+{
+    forces += (1.0 / mass) * pow2(k) * f;
+}
+
 void Model0d::addSpringForce(float u0, float c)
 {
     forces -= (1.0 / mass) * c * pow2(k) * (u - u0);
@@ -52,4 +62,9 @@ void Model0d::compute()
 
     forces = 0;
     mul = 1.0;
+}
+
+float Model0d::computeForPoint()
+{
+    return mul * (forces + 2 * u - up);
 }

@@ -58,7 +58,7 @@ class Model1d
     /// `prepare*Boundary*` for both left and right.
 
     Domain1d forces;
-    Domain1d multiplier;
+    Domain1d divisor;
     /// describe the forces acting on the mass that cause it to move.
     /// Everytime `compute` is called the forces and multipliers are used to
     /// update `u`.
@@ -77,6 +77,11 @@ class Model1d
     Model1d(int N, float fs=44100);
     /// Is he constructor for the `Model1d` class, where `fs` is the sample
     /// rate and `N` is the number of points in the domain.
+
+    void addBarrierCollision(float b, float K, float alpha);
+    /// Adds a collision with a rigid barrier *below* the domain where `b` is
+    /// the position of the barrier, `K` is the stiffness, and `alpha` is a
+    /// non-linear exponent of the collision. 
 
     void addContinuousBowForce(int i, float vb, float fb, float alpha);
     /// Adds a continuous bow force where `vb` is the bow speed, `fb` is the
@@ -103,6 +108,10 @@ class Model1d
     void addFrequencyDependentDamping(float sigma1);
     /// Adds a dampening force that cause higher frequencies to die out faster
     /// than lower ones. `sigma1` controls the amount of dampening.
+
+    void addInterpolatedForce(float p, float f);
+    /// Add a force `f` spread linearly between the points around fractional
+    /// point `p`.
 
     void addReedForce(Reed *reed, float wavespeed, float pm);
     /// Adds a woodwind-style reed force at the left side of the system. `reed`
