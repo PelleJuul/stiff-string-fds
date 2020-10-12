@@ -1,19 +1,53 @@
-HEADERS=$(wildcard pal-fds/*.h)
-DOCS=$(patsubst pal-fds/%.h, docs/%.h.md, $(HEADERS))
+CPP=clang++
+CPPFLAGS=-std=c++11 -D PAL
+LIBS=-lsdl2 -lportaudio -lsndfile -framework OpenGl
 
-.PHONY: clean examples documentation
+# Uncomment this if you want to debug your app.
+# CPPFLAGS+=-g
 
-examples:
-	make -C examples/ all
+# Uncomment this if you want to optimize your app.
+CPPFLAGS+=-O3
 
-documentation: $(DOCS) docs/
+# Use this command to choose your install location.
+INSTALL_LOCATION=/usr/local/bin
 
-docs/:
-	mkdir docs
+# Edit these variables to suit your application.
+BIN=main
+SOURCES=$(wildcard *.cpp)
+OBJECTS=$(patsubst %.cpp, %.o, $(SOURCES))
+DEPS := $(OBJECTS:.o=.d)
 
-docs/%.h.md : pal-fds/%.h docs/
-	python literalize.py $< > $@
+# pal specific variables.
+PAL_SOURCES=$(wildcard pal/*.cpp) $(wildcard pal/**/*.cpp)
+PAL_HEADERS=$(wildcard pal/*.h) $(wildcard pal/**/*.h)
+PAL_OBJECTS=$(patsubst %.cpp, %.o, $(PAL_SOURCES))
+PAL_DEPS := $(PAL_OBJECTS:.o=.d)
+
+all: $(BIN)
+
+$(BIN): $(OBJECTS) $(PAL_OBJECTS)
+	$(CPP) $(CPPFLAGS) $(PAL_OBJECTS) $(OBJECTS) $(LIBS) -o $(BIN)
+
+%.o : %.cpp
+	$(CPP) $(CPPFLAGS) -c -MMD -MP $< -o $@
+
+.phony: clean run install
+
+run: all
+	./$(BIN)
+
+install:
+	sed 's|{{palPath}}|$(PWD)|g' pal.py > $(INSTALL_LOCATION)/pal
+	chmod +x $(INSTALL_LOCATION)/pal
 
 clean:
-	$(MAKE) -C examples clean
-	rm -f $(DOCS)
+	rm -f $(PAL_OBJECTS)
+	rm -f $(PAL_DEPS)
+	rm -f $(OBJECTS)
+	rm -f $(DEPS)
+	rm -f $(BIN)
+	rm -f *.o *.d
+	rm -f imgui.ini
+
+-include $(PAL_DEPS)
+-include $(DEPS)
