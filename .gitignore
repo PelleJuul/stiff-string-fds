@@ -4,6 +4,7 @@
 **/*.ini
 .vscode
 junk/
+old/
 **/.DS_Store
 examples/Model1dExample
 examples/ReedExample
