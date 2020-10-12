@@ -318,7 +318,7 @@ int main(int argc, char **argv)
         }
     };
 
-    Gui gui(800, 600, "New pal project");
+    Gui gui(800, 600, "Stiff String Example");
     int iterations = 50;
 
     while (gui.draw())
